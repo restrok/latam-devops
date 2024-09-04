@@ -5,7 +5,6 @@ provider "google" {
 
 variable "project_id" {}
 variable "region" {}
-variable "bucket_name" {}
 variable "dataset_id" {}
 variable "table_id" {}
 variable "pubsub_topic" {}
@@ -23,13 +22,49 @@ variable "cloud_functions" {
   }))
 }
 
-resource "google_storage_bucket" "bucket" {
-  name     = var.bucket_name
-  location = var.region
+variable "buckets" {
+  type = map(object({
+    name                        = string
+    location                    = string
+    uniform_bucket_level_access = bool
+    cors                        = list(object({
+      max_age_seconds = number
+      method          = list(string)
+      origin          = list(string)
+      response_header = list(string)
+    }))
+    lifecycle_age             = number
+    versioning_enabled        = bool
+    logging_log_bucket        = string
+    logging_log_object_prefix = string
+    website_main_page_suffix  = string
+    website_not_found_page    = string
+  }))
 }
 
-resource "google_pubsub_topic" "topic" {
-  name = var.pubsub_topic
+module "storage" {
+  source = "./submodules/cloud-storage"
+
+  for_each = var.buckets
+
+  name                        = each.value.name
+  location                    = each.value.location
+  uniform_bucket_level_access = each.value.uniform_bucket_level_access
+  cors                        = each.value.cors
+  lifecycle_age               = each.value.lifecycle_age
+  versioning_enabled          = each.value.versioning_enabled
+  logging_log_bucket          = each.value.logging_log_bucket
+  logging_log_object_prefix   = each.value.logging_log_object_prefix
+  website_main_page_suffix    = each.value.website_main_page_suffix
+  website_not_found_page      = each.value.website_not_found_page
+}
+
+module "pubsub" {
+  source = "./submodules/pubsub"
+
+  topic_name        = var.pubsub_topic
+  subscription_name = "process-data-subscription"
+  push_endpoint     = module.cloud_functions["process_data"].https_trigger_url
 }
 
 module "cloud_functions" {
@@ -47,7 +82,7 @@ module "cloud_functions" {
   environment_variables = each.value.environment_variables
   region             = var.region
   project_id         = var.project_id
-  bucket_name        = var.bucket_name
+  bucket_name        = module.storage["function_code"].name
 }
 
 module "api_gateway" {
@@ -62,4 +97,8 @@ module "api_gateway" {
     get_data    = module.cloud_functions["get_data"].https_trigger_url
   }
   openapi_template_path = "${path.module}/openapi.yaml.tpl"
+}
+
+resource "random_id" "id" {
+  byte_length = 8
 }

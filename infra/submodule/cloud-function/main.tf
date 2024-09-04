@@ -7,58 +7,45 @@ terraform {
   }
 }
 
-resource "random_id" "default" {
-  byte_length = 8
-}
+resource "google_storage_bucket" "bucket" {
+  name                        = var.name
+  location                    = var.location
+  uniform_bucket_level_access = var.uniform_bucket_level_access
 
-resource "google_storage_bucket" "function_bucket" {
-  name                        = "${random_id.default.hex}-gcf-source" # Every bucket name must be globally unique
-  location                    = var.region
-  uniform_bucket_level_access = true
-}
-
-data "archive_file" "default" {
-  type        = "zip"
-  output_path = "/tmp/function-source-${var.name}.zip"
-  source_dir  = var.source_directory
-}
-
-resource "google_storage_bucket_object" "object" {
-  name   = "function-source-${var.name}.zip"
-  bucket = google_storage_bucket.function_bucket.name
-  source = data.archive_file.default.output_path # Add path to the zipped function source code
-}
-
-resource "google_cloudfunctions2_function" "function" {
-  name        = var.name
-  location    = var.region
-  description = "Cloud Function ${var.name}"
-
-  build_config {
-    runtime     = var.runtime
-    entry_point = var.entry_point
-    source {
-      storage_source {
-        bucket = google_storage_bucket.function_bucket.name
-        object = google_storage_bucket_object.object.name
-      }
+  dynamic "cors" {
+    for_each = var.cors
+    content {
+      max_age_seconds = cors.value.max_age_seconds
+      method          = cors.value.method
+      origin          = cors.value.origin
+      response_header = cors.value.response_header
     }
   }
 
-  service_config {
-    max_instance_count = 1
-    available_memory   = "256M"
-    timeout_seconds    = 60
+  lifecycle_rule {
+    action {
+      type = "Delete"
+    }
+    condition {
+      age = var.lifecycle_age
+    }
+  }
+
+  versioning {
+    enabled = var.versioning_enabled
+  }
+
+  logging {
+    log_bucket        = var.logging_log_bucket
+    log_object_prefix = var.logging_log_object_prefix
+  }
+
+  website {
+    main_page_suffix = var.website_main_page_suffix
+    not_found_page   = var.website_not_found_page
   }
 }
 
-resource "google_cloud_run_service_iam_member" "member" {
-  location = google_cloudfunctions2_function.function.location
-  service  = google_cloudfunctions2_function.function.name
-  role     = "roles/run.invoker"
-  member   = "allUsers"
-}
-
-output "https_trigger_url" {
-  value = google_cloudfunctions2_function.function.service_config[0].uri
+output "name" {
+  value = google_storage_bucket.bucket.name
 }

@@ -24,10 +24,10 @@ resource "google_pubsub_subscription" "subscription" {
   }
 }
 
-output "topic_id" {
-  value = google_pubsub_topic.topic.id
-}
+# output "topic_id" {
+#   value = google_pubsub_topic.topic.id
+# }
 
-output "subscription_id" {
-  value = google_pubsub_subscription.subscription.id
-}
+# output "subscription_id" {
+#   value = google_pubsub_subscription.subscription.id
+# }

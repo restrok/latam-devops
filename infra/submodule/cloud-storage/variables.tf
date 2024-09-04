@@ -1,20 +1,65 @@
-variable "buckets" {
-  description = "A map of buckets to create, where the key is the bucket name and the value is an object with bucket properties."
-  type = map(object({
-    name                        = string
-    location                    = string
-    uniform_bucket_level_access = bool
-    cors                        = list(object({
-      max_age_seconds = number
-      method          = list(string)
-      origin          = list(string)
-      response_header = list(string)
-    }))
-    lifecycle_age             = number
-    versioning_enabled        = bool
-    logging_log_bucket        = string
-    logging_log_object_prefix = string
-    website_main_page_suffix  = string
-    website_not_found_page    = string
-  }))
+variable "name" {
+  description = "The name of the bucket."
+  type        = string
+}
+
+variable "location" {
+  description = "The location of the bucket."
+  type        = string
+}
+
+variable "uniform_bucket_level_access" {
+  description = "Enable uniform bucket level access."
+  type        = bool
+}
+
+variable "cors" {
+  description = "CORS configuration."
+  type = object({
+    max_age_seconds  = number
+    methods          = list(string)
+    origins          = list(string)
+    response_headers = list(string)
+  })
+}
+
+variable "lifecycle_age" {
+  description = "The age in days to delete objects."
+  type        = number
+}
+
+variable "versioning_enabled" {
+  description = "Enable versioning for the bucket."
+  type        = bool
+}
+
+variable "logging_log_bucket" {
+  description = "The bucket to store logs."
+  type        = string
+}
+
+variable "logging_log_object_prefix" {
+  description = "The object prefix for logs."
+  type        = string
+}
+
+variable "website_main_page_suffix" {
+  description = "The main page suffix for the website."
+  type        = string
+}
+
+variable "website_not_found_page" {
+  description = "The 404 page for the website."
+  type        = string
+}
+
+variable "labels" {
+  description = "Labels to apply to the bucket."
+  type        = map(string)
+}
+
+variable "notification_topic" {
+  description = "The Pub/Sub topic to notify when new objects are finalized in the bucket."
+  type        = string
+  default     = ""
 }

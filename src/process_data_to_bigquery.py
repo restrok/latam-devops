@@ -20,7 +20,7 @@ def process_pubsub_event(event, context):
         pubsub_message = event['data']
         message = json.loads(pubsub_message)
 
-        # Obtener el nombre del archivo del mensaje
+        # Obtener el nombre del archivo del mensaje 
         filename = message['name']
         
         # Descargar el archivo del bucket

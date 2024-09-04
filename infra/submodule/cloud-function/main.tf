@@ -46,6 +46,6 @@ resource "google_storage_bucket" "bucket" {
   }
 }
 
-output "name" {
-  value = google_storage_bucket.bucket.name
-}
+# output "name" {
+#   value = google_storage_bucket.bucket.name
+# }

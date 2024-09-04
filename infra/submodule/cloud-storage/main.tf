@@ -7,47 +7,55 @@ terraform {
   }
 }
 
-resource "google_storage_bucket" "buckets" {
-  for_each = var.buckets
+resource "google_storage_bucket" "bucket" {
+  name                        = var.name
+  location                    = var.location
+  uniform_bucket_level_access = var.uniform_bucket_level_access
 
-  name                        = each.value.name
-  location                    = each.value.location
-  uniform_bucket_level_access = each.value.uniform_bucket_level_access
-
-  dynamic "cors" {
-    for_each = each.value.cors
-    content {
-      max_age_seconds = cors.value.max_age_seconds
-      method          = cors.value.method
-      origin          = cors.value.origin
-      response_header = cors.value.response_header
-    }
+  cors {
+    max_age_seconds           = var.cors.max_age_seconds
+    method                   = var.cors.methods
+    origin                  = var.cors.origins
+    response_header       = var.cors.response_headers
   }
 
   lifecycle_rule {
     action {
       type = "Delete"
     }
+
     condition {
-      age = each.value.lifecycle_age
+      age = var.lifecycle_age
     }
   }
 
   versioning {
-    enabled = each.value.versioning_enabled
+    enabled = var.versioning_enabled
   }
 
   logging {
-    log_bucket        = each.value.logging_log_bucket
-    log_object_prefix = each.value.logging_log_object_prefix
+    log_bucket        = var.logging_log_bucket
+    log_object_prefix = var.logging_log_object_prefix
   }
 
   website {
-    main_page_suffix = each.value.website_main_page_suffix
-    not_found_page   = each.value.website_not_found_page
+    main_page_suffix = var.website_main_page_suffix
+    not_found_page   = var.website_not_found_page
   }
+
+  labels = var.labels
 }
 
-output "bucket_names" {
-  value = { for k, v in google_storage_bucket.buckets : k => v.name }
+resource "google_storage_notification" "bucket_notification" {
+  count  = var.notification_topic != "" ? 1 : 0
+  bucket = google_storage_bucket.bucket.name
+  topic  = var.notification_topic
+
+  payload_format = "JSON_API_V1"
+
+  event_types = [
+    "OBJECT_FINALIZE",
+  ]
+
+  depends_on = [google_project_service.storage]
 }

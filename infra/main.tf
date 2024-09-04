@@ -13,6 +13,7 @@ module "storage" {
   logging_log_object_prefix   = each.value.logging_log_object_prefix
   website_main_page_suffix    = each.value.website_main_page_suffix
   website_not_found_page      = each.value.website_not_found_page
+  notification_topic          = lookup(each.value, "notification_topic", "")
 }
 
 module "pubsub" {
@@ -53,6 +54,18 @@ module "api_gateway" {
     get_data    = module.cloud_functions["get_data"].https_trigger_url
   }
   openapi_template_path = "${path.module}/openapi.yaml.tpl"
+}
+
+module "bigquery" {
+  source = "./submodules/bigquery"
+
+  project_id             = var.project_id
+  location               = var.region
+  dataset_id             = var.dataset_id
+  table_id               = var.table_id
+  schema_path            = var.schema_path
+  labels                 = var.labels
+  time_partitioning_type = var.time_partitioning_type
 }
 
 resource "random_id" "id" {

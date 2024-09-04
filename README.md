@@ -28,39 +28,7 @@ Desarrollar un sistema en la nube para ingestar, almacenar y exponer datos media
 
 ### Diagrama de Arquitectura
 
-```plaintext
-+------------------+          +------------------+          +------------------+
-|                  |          |                  |          |                  |
-|   Productores    |          |   GCP Pub/Sub    |          |   GCP Pub/Sub    |
-|   de Datos       +--------->|   (Publicación)  +--------->|   (Suscripción)  |
-|                  |          |                  |          |                  |
-+-------^----------+          +--------^---------+          +--------^---------+
-        |                              |                           |
-        |                              |                           |
-        |                              |                           |
-        |                              |                           |
-        |                              |                           |
-        |                              |                           |
-+-------+----------+          +--------+---------+          +--------+---------+
-|                  |          |                  |          |                  |
-|   Cloud         +<---------+   BigQuery        +<---------+   Cloud          |
-|   Functions     |          |   (Almacenamiento)|          |   Functions      |
-|   (Procesamiento)|          |                  |          |   (Ingesta)      |
-|                  |          |                  |          |                  |
-+-------^----------+          +--------^---------+          +--------^---------+
-        |                              |                           |
-        |                              |                           |
-        |                              |                           |
-        |                              |                           |
-        |                              |                           |
-        |                              |                           |
-+-------+----------+          +--------+---------+          +--------+---------+
-|                  |          |                  |          |                  |
-|   Cloud          +<---------+   Cloud          +<---------+   Terceros       |
-|   Endpoints      |          |   Functions      |          |   (Consumo)      |
-|                  |          |   (API HTTP)     |          |                  |
-+------------------+          +------------------+          +------------------+
-```
+![Diagrama de Arquitectura](./images/diagram.png)
 
 ### Descripción del Diagrama
 
@@ -128,3 +96,10 @@ Define métricas SLIs para los servicios del sistema y un SLO para cada uno de l
 ```
 
 Este `README.md` proporciona una estructura clara y completa del desafío técnico, detallando cada parte del ejercicio y las instrucciones correspondientes.
+
+
+Notas que voy dejando para agregar luego:
+- Teniendo la posibilidad de usar los servicios nativos de GCP no veo la necesidad de implementar herramietas opensource como FastAPI, MQTT, Prometheus/Grafana.
+- Adicionalmente la implementacion de herramientas open source requeriria a futuro mantenimiento, sin contar todas las configuraciones de seguridad necesarias para correr en un ambiente productivo.
+- Por cuestiones de tiempo aqui solo implementamos un ambiente unico, pero podria cambiarse el naming-convention para mostrar el ambiente en el nombre del recurso creado.
+- 

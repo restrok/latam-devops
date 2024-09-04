@@ -14,6 +14,8 @@ module "storage" {
   website_main_page_suffix    = each.value.website_main_page_suffix
   website_not_found_page      = each.value.website_not_found_page
   notification_topic          = lookup(each.value, "notification_topic", "")
+
+  depends_on = [ module.pubsub ]
 }
 
 module "pubsub" {

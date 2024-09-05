@@ -13,16 +13,6 @@ variable "uniform_bucket_level_access" {
   type        = bool
 }
 
-variable "cors" {
-  description = "CORS configuration."
-  type = object({
-    max_age_seconds  = number
-    methods          = list(string)
-    origins          = list(string)
-    response_headers = list(string)
-  })
-}
-
 variable "lifecycle_age" {
   description = "The age in days to delete objects."
   type        = number

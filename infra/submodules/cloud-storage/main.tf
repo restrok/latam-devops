@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     google = {
-      source  = "hashicorp/google"
+      source  = "hashicorp/google-beta"
       version = ">= 4.34.0"
     }
   }
@@ -11,13 +11,6 @@ resource "google_storage_bucket" "bucket" {
   name                        = var.name
   location                    = var.location
   uniform_bucket_level_access = var.uniform_bucket_level_access
-
-  cors {
-    max_age_seconds           = var.cors.max_age_seconds
-    method                   = var.cors.methods
-    origin                  = var.cors.origins
-    response_header       = var.cors.response_headers
-  }
 
   lifecycle_rule {
     action {
@@ -57,5 +50,5 @@ resource "google_storage_notification" "bucket_notification" {
     "OBJECT_FINALIZE",
   ]
 
-  depends_on = [google_project_service.storage]
+  # depends_on = [google_project_service.storage]
 }

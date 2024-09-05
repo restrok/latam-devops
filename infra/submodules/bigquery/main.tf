@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     google = {
-      source  = "hashicorp/google"
+      source  = "hashicorp/google-beta"
       version = ">= 4.34.0"
     }
   }
@@ -20,7 +20,7 @@ resource "google_bigquery_table" "table" {
   table_id   = var.table_id
   project    = var.project_id
 
-  schema     = file(var.schema_path)
+  schema = file(var.schema_path)
   time_partitioning {
     type = var.time_partitioning_type
   }

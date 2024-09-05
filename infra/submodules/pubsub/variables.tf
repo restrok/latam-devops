@@ -23,7 +23,7 @@ variable "retain_acked_messages" {
 variable "message_retention_duration" {
   description = "How long to retain unacknowledged messages in the subscription's backlog, from the moment a message is published."
   type        = string
-  default     = "604800s"  # 7 days
+  default     = "604800s" # 7 days
 }
 
 variable "push_endpoint" {

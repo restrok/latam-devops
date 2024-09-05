@@ -1,6 +1,6 @@
 import os
+import json
 from google.cloud import bigquery
-from google.cloud.functions.context import Context
 
 # Configuración del cliente de BigQuery
 bigquery_client = bigquery.Client()
@@ -24,7 +24,9 @@ def get_data(request):
         # Convertir los resultados a una lista de diccionarios
         rows = [dict(row) for row in results]
 
-        return (jsonify(rows), 200)
+        # Devolver los resultados como una respuesta JSON
+        return (json.dumps(rows), 200, {'Content-Type': 'application/json'})
 
     except Exception as e:
-        return (jsonify({"error": str(e)}), 500)
+        # Devolver el error como una respuesta JSON
+        return (json.dumps({"error": str(e)}), 500, {'Content-Type': 'application/json'})

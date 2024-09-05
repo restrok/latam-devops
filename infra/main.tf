@@ -14,29 +14,22 @@ module "storage" {
   logging_log_object_prefix = each.value.logging_log_object_prefix
   website_main_page_suffix  = each.value.website_main_page_suffix
   website_not_found_page    = each.value.website_not_found_page
-  notification_topic        = lookup(each.value, "notification_topic", "")
+  # notification_topic        = lookup(each.value, "notification_topic", "")
+  notification_topic = each.value.notification_topic
   labels                    = var.labels
 
   # depends_on = [module.pubsub]
 }
 
-# module "pubsub" {
-#   source = "./submodules/pubsub"
-
-#   topic_name        = "${var.project_prefix}-topic"
-#   subscription_name = "process-data-subscription"
-#   push_endpoint     = module.cloud_functions["ingest_data_to_bucket"]
-# }
-
 # Instancia del módulo para funciones activadas por HTTP
-module "http_functions" {
-  source = "./submodules/cloud-function-http"
+# module "http_functions" {
+#   source = "./submodules/cloud-function-http"
 
-  functions         = var.cloud_functions_http
-  source_code_bucket = "function-code-bucket-${var.project_prefix}"
+#   functions         = var.cloud_functions_http
+#   source_code_bucket = "function-code-bucket-${var.project_prefix}"
 
-  depends_on = [ module.storage ]
-}
+#   depends_on = [ module.storage ]
+# }
 
 module "event_functions" {
   source = "./submodules/cloud-function-event" 
@@ -47,19 +40,19 @@ module "event_functions" {
   depends_on = [ module.storage ]
 }
 
-module "api_gateway" {
-  source          = "./submodules/api-gateway"
-  project_id      = var.project_id
-  region          = var.region
-  api_name        = "my-api"
-  api_config_name = "my-api-config"
-  gateway_name    = "my-gateway"
-  functions = {
-    upload_data = module.http_functions.http_function_urls["ingest_data_to_bucket"]
-    get_data    = module.http_functions.http_function_urls["get_data_from_bigquery"]
-  }
-  # openapi_template_path = "${path.module}/openapi.yaml.tpl"
-}
+# module "api_gateway" {
+#   source          = "./submodules/api-gateway"
+#   project_id      = var.project_id
+#   region          = var.region
+#   api_name        = "my-api"
+#   api_config_name = "my-api-config"
+#   gateway_name    = "my-gateway"
+#   functions = {
+#     upload_data = module.http_functions.http_function_urls["ingest_data_to_bucket"]
+#     get_data    = module.http_functions.http_function_urls["get_data_from_bigquery"]
+#   }
+#   # openapi_template_path = "${path.module}/openapi.yaml.tpl"
+# }
 
 module "bigquery" {
   source = "./submodules/bigquery"
@@ -72,7 +65,3 @@ module "bigquery" {
   labels                 = var.labels
   time_partitioning_type = var.time_partitioning_type
 }
-
-# resource "random_id" "id" {
-#   byte_length = 8
-# }

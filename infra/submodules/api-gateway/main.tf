@@ -24,11 +24,13 @@ resource "google_api_gateway_api_config" "api_config" {
       }))
     }
   }
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "google_api_gateway_gateway" "gateway" {
-  # api        = google_api_gateway_api.api.api_id
-  api_config = google_api_gateway_api_config.api_config.api_config_id
+  api_config = google_api_gateway_api_config.api_config.id
   gateway_id = var.gateway_name
-  region     = var.region
+  # region     = var.region
 }

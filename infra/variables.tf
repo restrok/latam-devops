@@ -56,5 +56,6 @@ variable "buckets" {
     logging_log_object_prefix = string
     website_main_page_suffix  = string
     website_not_found_page    = string
+    notification_topic        = string
   }))
 }

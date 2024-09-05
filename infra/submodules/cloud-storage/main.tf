@@ -26,15 +26,15 @@ resource "google_storage_bucket" "bucket" {
     enabled = var.versioning_enabled
   }
 
-  logging {
-    log_bucket        = var.logging_log_bucket
-    log_object_prefix = var.logging_log_object_prefix
-  }
+  # logging {
+  #   log_bucket        = var.logging_log_bucket
+  #   log_object_prefix = var.logging_log_object_prefix
+  # }
 
-  website {
-    main_page_suffix = var.website_main_page_suffix
-    not_found_page   = var.website_not_found_page
-  }
+  # website {
+  #   main_page_suffix = var.website_main_page_suffix
+  #   not_found_page   = var.website_not_found_page
+  # }
 
   labels = var.labels
 }

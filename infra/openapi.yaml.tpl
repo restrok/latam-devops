@@ -7,6 +7,15 @@ schemes:
   - https
 produces:
   - application/json
+securityDefinitions: # Aquí añades tus definiciones de seguridad
+  google_id_token:
+    authorizationUrl: ""
+    flow: "implicit"
+    type: "oauth2"
+    x-google-issuer: "https://accounts.google.com"
+    x-google-jwks_uri: "https://www.googleapis.com/oauth2/v3/certs"
+security: # Aquí aplicas los requisitos de seguridad a toda la API
+  - google_id_token: []
 paths:
   /upload:
     post:

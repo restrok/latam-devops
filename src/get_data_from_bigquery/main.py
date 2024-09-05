@@ -1,6 +1,7 @@
+from google.cloud import bigquery
 import os
 import json
-from google.cloud import bigquery
+from datetime import datetime
 
 # Configuración del cliente de BigQuery
 bigquery_client = bigquery.Client()
@@ -8,6 +9,12 @@ bigquery_client = bigquery.Client()
 # Variables de entorno
 dataset_id = os.environ.get('DATASET_ID')
 table_id = os.environ.get('TABLE_ID')
+
+def custom_serializer(obj):
+    """Serializador personalizado para objetos no serializables por defecto."""
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    raise TypeError(f"Object of type {obj.__class__.__name__} is not JSON serializable")
 
 def get_data(request):
     try:
@@ -25,7 +32,8 @@ def get_data(request):
         rows = [dict(row) for row in results]
 
         # Devolver los resultados como una respuesta JSON
-        return (json.dumps(rows), 200, {'Content-Type': 'application/json'})
+        # Usamos la función `default` del `json.dumps` para manejar la serialización personalizada
+        return (json.dumps(rows, default=custom_serializer), 200, {'Content-Type': 'application/json'})
 
     except Exception as e:
         # Devolver el error como una respuesta JSON

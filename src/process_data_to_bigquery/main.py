@@ -1,8 +1,8 @@
-import os
+import base64
 import json
 import csv
+import os
 from google.cloud import storage, bigquery
-from google.cloud import pubsub_v1
 
 # Configuración de clientes de Google Cloud
 storage_client = storage.Client()
@@ -17,14 +17,15 @@ def process_pubsub_event(event, context):
     """Triggered from a message on a Cloud Pub/Sub topic."""
     try:
         # Decodificar el mensaje de Pub/Sub
-        pubsub_message = event['data']
+        pubsub_message = base64.b64decode(event['data']).decode('utf-8')
         message = json.loads(pubsub_message)
 
-        # Obtener el nombre del archivo del mensaje 
+        # Obtener el nombre del archivo del mensaje
         filename = message['name']
+        bucket = message['bucket']
         
         # Descargar el archivo del bucket
-        bucket = storage_client.bucket(bucket_name)
+        bucket = storage_client.bucket(bucket)
         blob = bucket.blob(filename)
         data = blob.download_as_string().decode('utf-8')
 

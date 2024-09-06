@@ -49,7 +49,7 @@ steps:
     id: 'Terraform Plan'
     args:
       - 'plan'
-      - '-var-file=infra/vars/dev.tfvars'      
+      - '-var-file=vars/dev.tfvars'      
       - '-input=false'
       - '-out=tfplan'
     dir: 'infra'      

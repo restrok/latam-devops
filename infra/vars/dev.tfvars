@@ -1,15 +1,11 @@
-project_id = "latam-test-434700"
-region     = "us-central1"
-# dataset_id   = "your-dataset-id"
-# table_id     = "your-table-id"
-# pubsub_topic = "your-pubsub-topic"
+project_id     = "latam-test-434700"
+region         = "us-central1"
 project_prefix = "latam_test"
 
 
 buckets = {
   function_code = {
-    name = "function-code-bucket"
-    # location                    = "your-region"
+    name                        = "function-code-bucket"
     uniform_bucket_level_access = true
     cors                        = []
     lifecycle_age               = 365
@@ -21,8 +17,7 @@ buckets = {
     notification_topic          = ""
   }
   ingest_data = {
-    name = "ingest-data-bucket"
-    # location                    = "your-region"
+    name                        = "ingest-data-bucket"
     uniform_bucket_level_access = true
     cors                        = []
     lifecycle_age               = 365
@@ -34,8 +29,7 @@ buckets = {
     notification_topic          = "projects/latam-test-434700/topics/process_data_to_bigquery"
   }
   terraform_state = {
-    name = "terraform-state-bucket"
-    # location                    = "your-region"
+    name                        = "terraform-state-bucket"
     uniform_bucket_level_access = true
     cors                        = []
     lifecycle_age               = 365
@@ -81,7 +75,6 @@ cloud_functions_event = {
     entry_point        = "process_pubsub_event"
     trigger_http       = false
     event_trigger_type = "providers/cloud.pubsub/eventTypes/topic.publish"
-    # event_trigger_resource = "projects/latam-test-434700/topics/latam_test-topic"
     environment_variables = {
       BUCKET_NAME = "ingest-data-bucket-latam_test"
       DATASET_ID  = "latam_test_dataset"
@@ -96,27 +89,27 @@ time_partitioning_type = "DAY"
 
 
 cloudbuild-config = {
-  develop = {
-    repo     = "latam-devops"
-    owner    = "restrok"
+  cd-plan = {
     filename = "tf-plan.yaml"
     github_configurations = {
-      push = {
-        branch = "^develop$"
-    } }
+      name  = "latam-devops"
+      owner = "github"
+      branch = "^develop$"
+    }
   }
-  master = {
-    repo     = "latam-devops"
-    owner    = "restrok"
+  cd-apply = {
+
     filename = "tf-apply.yaml"
     github_configurations = {
-      push = {
-        branch = "^master$"
-    } }
+      name  = "latam-devops"
+      owner = "restrok"
+      branch = "^master$"
+    }
   }
-  cf-build = {
-    repo     = "latam-devops"
-    owner    = "restrok"
-    filename = "cf-build.yaml"
-  }
+  # ci-build = {
+  #   repo     = "latam-devops"
+  #   owner    = "restrok"
+  #   filename = "cf-build.yaml"
+  #   github_configurations = false
+  # }
 }

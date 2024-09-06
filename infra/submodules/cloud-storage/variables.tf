@@ -23,25 +23,25 @@ variable "versioning_enabled" {
   type        = bool
 }
 
-variable "logging_log_bucket" {
-  description = "The bucket to store logs."
-  type        = string
-}
+# variable "logging_log_bucket" {
+#   description = "The bucket to store logs."
+#   type        = string
+# }
 
-variable "logging_log_object_prefix" {
-  description = "The object prefix for logs."
-  type        = string
-}
+# variable "logging_log_object_prefix" {
+#   description = "The object prefix for logs."
+#   type        = string
+# }
 
-variable "website_main_page_suffix" {
-  description = "The main page suffix for the website."
-  type        = string
-}
+# variable "website_main_page_suffix" {
+#   description = "The main page suffix for the website."
+#   type        = string
+# }
 
-variable "website_not_found_page" {
-  description = "The 404 page for the website."
-  type        = string
-}
+# variable "website_not_found_page" {
+#   description = "The 404 page for the website."
+#   type        = string
+# }
 
 variable "labels" {
   description = "Labels to apply to the bucket."

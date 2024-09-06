@@ -51,7 +51,7 @@ steps:
       - 'apply'
       - '-input=false'
       - '-auto-approve'
-      - '-var-file=infra/vars/dev.tfvars'
+      - '-var-file=vars/dev.tfvars'
     dir: 'infra'
 
   # Integration Test

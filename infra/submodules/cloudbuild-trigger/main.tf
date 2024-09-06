@@ -12,7 +12,7 @@ resource "google_cloudbuild_trigger" "default" {
   project = var.project_id
   location = var.region
   name     = var.name
-  filename = "${path.module}/${var.cloudbuild-config.filename}"
+  filename = "infra/${path.module}/${var.cloudbuild-config.filename}"
   include_build_logs = "INCLUDE_BUILD_LOGS_WITH_STATUS"
 
   repository_event_config {

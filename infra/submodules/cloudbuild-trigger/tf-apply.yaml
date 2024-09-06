@@ -1,4 +1,5 @@
 steps:
+
   # unit test
   # - name: 'python:3.9'
   #   id: 'Run Unit Tests'
@@ -63,3 +64,6 @@ steps:
         pip install -r requirements-tests.txt && \
         python -m main.py
     dir: 'src/int-test'
+
+options:
+  logging: CLOUD_LOGGING_ONLY

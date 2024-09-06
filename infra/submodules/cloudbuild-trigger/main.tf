@@ -21,6 +21,7 @@ resource "google_cloudbuild_trigger" "default" {
       branch = var.cloudbuild-config.github_configurations.branch
     }
   }
-  service_account = "projects/${var.project_id}/serviceAccounts/440898024343-compute@developer.gserviceaccount.com"
+
+  service_account = "projects/${var.project_id}/serviceAccounts/latam-test@latam-test-434700.iam.gserviceaccount.com"
 
 }

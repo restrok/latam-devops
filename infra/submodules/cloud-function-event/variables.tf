@@ -6,11 +6,11 @@ variable "source_code_bucket" {
 variable "functions" {
   description = "A map of cloud function definitions"
   type = map(object({
-    name                   = string
-    runtime                = string
-    entry_point            = string
-    event_trigger_type     = string
+    name               = string
+    runtime            = string
+    entry_point        = string
+    event_trigger_type = string
     # event_trigger_resource = string
-    environment_variables  = map(string)
+    environment_variables = map(string)
   }))
 }

@@ -1,0 +1,65 @@
+steps:
+  # unit test
+  # - name: 'python:3.9'
+  #   id: 'Run Unit Tests'
+  #   entrypoint: 'bash'
+  #   args:
+  #     - '-c'
+  #     - |
+  #       python -m unittest discover -s src/unit-test/
+
+  # <if branch == develop end the pipeline>
+
+  # Comprimir todas las funciones en archivos .zip
+  - name: 'ubuntu'
+    id: 'Zip Functions'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        cd src
+        for dir in get_data_from_bigquery ingest_data_to_bucket process_data_to_bigquery; do
+          zip -r ${dir}.zip ${dir}/main.py ${dir}/requirements.txt
+        done
+    waitFor: ['Run Unit Tests']
+
+  #  Subir todos los archivos .zip al bucket de Cloud Storage
+  - name: 'gcr.io/cloud-builders/gsutil'
+    id: 'Upload Zips'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        gsutil cp src/*.zip gs://function-code-bucket-latam_test/
+    waitFor: ['Zip Functions']
+    
+  #<Terrafom Validate>
+
+  # Terraform Init
+  - name: 'hashicorp/terraform:latest'
+    id: 'Terraform Init'
+    args:
+      - 'init'
+      - '-input=false'
+    dir: 'infra'      
+
+  # Terraform Apply
+  - name: 'hashicorp/terraform:latest'
+    id: 'Terraform Apply'
+    args:
+      - 'apply'
+      - '-input=false'
+      - '-auto-approve'
+      - '-var-file=vars/dev.tfvars'
+    dir: 'infra'
+
+  # Integration Test
+  - name: 'python:3.9'
+    id: 'Integration Test'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        pip install -r requirements-tests.txt && \
+        python -m main.py
+    dir: 'src/int-test'

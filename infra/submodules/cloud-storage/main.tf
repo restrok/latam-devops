@@ -49,6 +49,4 @@ resource "google_storage_notification" "bucket_notification" {
   event_types = [
     "OBJECT_FINALIZE",
   ]
-
-  # depends_on = [google_project_service.storage]
 }

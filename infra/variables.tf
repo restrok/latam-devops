@@ -41,7 +41,7 @@ variable "cloud_functions_event" {}
 
 variable "buckets" {
   type = map(object({
-    name                        = string
+    name = string
     # location                    = string
     uniform_bucket_level_access = bool
     cors = list(object({
@@ -57,5 +57,19 @@ variable "buckets" {
     website_main_page_suffix  = string
     website_not_found_page    = string
     notification_topic        = string
+  }))
+}
+
+variable "cloudbuild_config" {
+  description = "Map of Cloud Build configurations."
+  type = map(object({
+    repo     = string
+    owner    = string
+    filename = string
+    github_configurations = map(object({
+      push = object({
+        branch = string
+      })
+    }))
   }))
 }

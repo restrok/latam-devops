@@ -17,7 +17,7 @@ resource "google_storage_bucket_object" "archive" {
 
 resource "google_pubsub_topic" "topic" {
   for_each = var.functions
-  
+
   name = each.value.name
 }
 

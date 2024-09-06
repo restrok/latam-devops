@@ -32,7 +32,7 @@ resource "google_cloudfunctions_function" "function_http" {
 
 output "http_function_urls" {
   value = {
-    for name, function in google_cloudfunctions_function.function_http : 
+    for name, function in google_cloudfunctions_function.function_http :
     name => function.https_trigger_url
   }
   description = "The HTTP trigger URLs for the HTTP-triggered Cloud Functions."

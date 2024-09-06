@@ -1,0 +1,29 @@
+steps:
+  # Unit Test
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      - 'beta'
+      - 'builds'
+      - 'triggers'
+      - 'run'
+      - 'cf-build'
+      - '--branch=develop'
+
+  # Terraform Init
+  - name: 'hashicorp/terraform:latest'
+    id: 'Terraform Init'
+    args:
+      - 'init'
+      - '-input=false'
+    # env:
+    #   - 'CLOUDSDK_COMPUTE_ZONE=europe-west1-b'
+
+  # Terraform Plan
+  - name: 'hashicorp/terraform:latest'
+    id: 'Terraform Plan'
+    args:
+      - 'plan'
+      - '-input=false'
+      - '-out=tfplan'
+    # env:
+    #   - 'CLOUDSDK_COMPUTE_ZONE=europe-west1-b'

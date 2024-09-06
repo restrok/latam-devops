@@ -16,7 +16,7 @@ module "storage" {
   website_not_found_page    = each.value.website_not_found_page
   # notification_topic        = lookup(each.value, "notification_topic", "")
   notification_topic = each.value.notification_topic
-  labels                    = var.labels
+  labels             = var.labels
 
   # depends_on = [module.pubsub]
 }
@@ -32,12 +32,12 @@ module "storage" {
 # }
 
 module "event_functions" {
-  source = "./submodules/cloud-function-event" 
+  source = "./submodules/cloud-function-event"
 
-  functions         = var.cloud_functions_event
+  functions          = var.cloud_functions_event
   source_code_bucket = "function-code-bucket-${var.project_prefix}"
 
-  depends_on = [ module.storage ]
+  depends_on = [module.storage]
 }
 
 # module "api_gateway" {
@@ -64,4 +64,15 @@ module "bigquery" {
   schema_path            = var.schema_path
   labels                 = var.labels
   time_partitioning_type = var.time_partitioning_type
+}
+
+module "cloudbuild_trigger" {
+  for_each = var.cloudbuild_config
+
+  source = "./modules/cloudbuild-trigger"
+
+  location              = var.region
+  name                  = each.key
+  filename              = each.value.filename
+  github_configurations = each.value.github_configurations
 }

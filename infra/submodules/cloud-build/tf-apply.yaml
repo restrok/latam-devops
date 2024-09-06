@@ -1,0 +1,38 @@
+steps:
+  # Unit Test
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      - 'beta'
+      - 'builds'
+      - 'triggers'
+      - 'run'
+      - 'cf-build'
+      - '--branch=master'
+
+  # Terraform Init
+  - name: 'hashicorp/terraform:latest'
+    id: 'Terraform Init'
+    args:
+      - 'init'
+      - '-input=false'
+    dir: 'infra'      
+
+  # Terraform Apply
+  - name: 'hashicorp/terraform:latest'
+    id: 'Terraform Apply'
+    args:
+      - 'apply'
+      - '-input=false'
+      - '-auto-approve'
+    dir: 'infra'
+
+  # Integration Test
+  - name: 'python:3.9' # Usa la imagen de Python que prefieras
+    id: 'Integration Test'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        pip install -r requirements-tests.txt && \
+        python -m main.py
+    dir: 'src/int-test' # 

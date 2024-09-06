@@ -68,19 +68,19 @@ cloud_functions_http = {
     event_trigger_type     = ""
     event_trigger_resource = ""
     environment_variables = {
-      DATASET_ID  = "latam_test_dataset"
-      TABLE_ID    = "latam_test_table"
+      DATASET_ID = "latam_test_dataset"
+      TABLE_ID   = "latam_test_table"
     }
   }
 }
 
 cloud_functions_event = {
   process_data_to_bigquery = {
-    name                   = "process_data_to_bigquery"
-    runtime                = "python39"
-    entry_point            = "process_pubsub_event"
-    trigger_http           = false
-    event_trigger_type     = "providers/cloud.pubsub/eventTypes/topic.publish"
+    name               = "process_data_to_bigquery"
+    runtime            = "python39"
+    entry_point        = "process_pubsub_event"
+    trigger_http       = false
+    event_trigger_type = "providers/cloud.pubsub/eventTypes/topic.publish"
     # event_trigger_resource = "projects/latam-test-434700/topics/latam_test-topic"
     environment_variables = {
       BUCKET_NAME = "ingest-data-bucket-latam_test"
@@ -93,3 +93,30 @@ cloud_functions_event = {
 schema_path            = "schema.json"
 labels                 = {}
 time_partitioning_type = "DAY"
+
+
+cloudbuild-config = {
+  develop = {
+    repo     = "latam-devops"
+    owner    = "restrok"
+    filename = "tf-plan.yaml"
+    github_configurations = {
+      push = {
+        branch = "^develop$"
+    } }
+  }
+  master = {
+    repo     = "latam-devops"
+    owner    = "restrok"
+    filename = "tf-apply.yaml"
+    github_configurations = {
+      push = {
+        branch = "^master$"
+    } }
+  }
+  cf-build = {
+    repo     = "latam-devops"
+    owner    = "restrok"
+    filename = "cf-build.yaml"
+  }
+}

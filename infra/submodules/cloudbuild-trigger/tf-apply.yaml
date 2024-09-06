@@ -51,7 +51,7 @@ steps:
       - 'apply'
       - '-input=false'
       - '-auto-approve'
-      - '-var-file=vars/dev.tfvars'
+      - '-var-file=infra/vars/dev.tfvars'
     dir: 'infra'
 
   # Integration Test
@@ -66,4 +66,4 @@ steps:
     dir: 'src/int-test'
 
 options:
-  logging: CLOUD_LOGGING_ONLY
+  defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET

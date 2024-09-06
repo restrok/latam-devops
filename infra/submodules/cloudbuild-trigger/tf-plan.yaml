@@ -49,10 +49,10 @@ steps:
     id: 'Terraform Plan'
     args:
       - 'plan'
-      - '-var-file=vars/dev.tfvars'      
+      - '-var-file=infra/vars/dev.tfvars'      
       - '-input=false'
       - '-out=tfplan'
     dir: 'infra'      
 
 options:
-  logging: CLOUD_LOGGING_ONLY
+  defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET

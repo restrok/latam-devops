@@ -53,3 +53,6 @@ steps:
       - '-input=false'
       - '-out=tfplan'
     dir: 'infra'      
+
+options:
+  logging: CLOUD_LOGGING_ONLY

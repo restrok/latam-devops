@@ -12,7 +12,7 @@ resource "google_api_gateway_api" "api" {
 }
 
 locals {
-  api_config_hash = filesha256("${path.root}/openapi.yaml.tpl")
+  api_config_hash = substr(filesha256("${path.root}/openapi.yaml.tpl"), 0, 30)
   api_config_id   = "${var.api_config_name}-${local.api_config_hash}"
 }
 resource "google_api_gateway_api_config" "api_config" {

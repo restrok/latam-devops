@@ -92,8 +92,8 @@ cloudbuild-config = {
   cd-plan = {
     filename = "tf-plan.yaml"
     github_configurations = {
-      name  = "latam-devops"
-      owner = "github"
+      name   = "latam-devops"
+      owner  = "github"
       branch = "^develop$"
     }
   }
@@ -101,8 +101,8 @@ cloudbuild-config = {
 
     filename = "tf-apply.yaml"
     github_configurations = {
-      name  = "latam-devops"
-      owner = "restrok"
+      name   = "latam-devops"
+      owner  = "restrok"
       branch = "^master$"
     }
   }

@@ -11,19 +11,21 @@ steps:
 
   # <if branch == develop end the pipeline>
 
-  # Comprimir todas las funciones en archivos .zip
+  # # ZIP CF Code
   - name: 'ubuntu'
     id: 'Zip Functions'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
-        apt-get install -y zip
+        apt-get update && apt-get install -y zip
         cd src
         for dir in get_data_from_bigquery ingest_data_to_bucket process_data_to_bigquery; do
-          zip -r ${dir}-master.zip ${dir}/main.py ${dir}/requirements.txt
+          cd ${dir}
+          zip -r ../${dir}-develop.zip main.py requirements.txt
+          cd ..
         done
-    waitFor: ['Run Unit Tests']
+    # waitFor: ['Run Unit Tests']
 
   #  Subir todos los archivos .zip al bucket de Cloud Storage
   - name: 'gcr.io/cloud-builders/gsutil'
@@ -53,7 +55,7 @@ steps:
       - '-input=false'
       - '-auto-approve'
       - '-var-file=vars/dev.tfvars'
-      - '-var="version=master"'      
+      - '-var="build_version=master"'      
     dir: 'infra'
 
   # Integration Test

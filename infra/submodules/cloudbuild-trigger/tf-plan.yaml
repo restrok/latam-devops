@@ -53,7 +53,7 @@ steps:
     args:
       - 'plan'
       - '-var-file=vars/dev.tfvars'
-      - '-var="build_version=develop"'
+      - '-var=build_version=develop'
       - '-input=false'
       - '-out=tfplan'
     dir: 'infra'      

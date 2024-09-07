@@ -55,7 +55,7 @@ steps:
       - '-input=false'
       - '-auto-approve'
       - '-var-file=vars/dev.tfvars'
-      - '-var="build_version=master"'      
+      - '-var=build_version=develop'    
     dir: 'infra'
 
   # Integration Test

@@ -52,18 +52,18 @@ Adicionalmente como buena practica se debe separar el pipeline de Continuous Int
 #### Algunas aclaraciones:
    - Se utiliza una convención de nombres para artefactos.
  '<function_name>-<develop/master>.zip'
-   - Los Unit Test no estan generados, por lo que ese paso se saltea
-   - El test de integracion solo espera como respuesta valida un 200. Por lo que en un ambiente productivo seria necesario mejorar el codigo para validad que realmente la informacion devuelta por el sistema sea la esperada.
+   - Los Unit Test no están generados, por lo que ese paso se saltea
+   - El test de integración solo espera como respuesta valida un 200. Por lo qu  e en un ambiente productivo seria necesario mejorar el codigo para validad que realmente la información devuelta por el sistema sea la esperada.
    ![Integration Test](./images/int-test.png)
    - El 'terraform validate' no se ejecuta para agilizar el proceso, pero es recomendable realizarlo en producción.
 
 
 #### Ejecuciones:
-- Ultima ejecucion de CI/CD: https://github.com/restrok/latam-devops/runs/29813460954
-- Ultima ejecucion de CI: https://github.com/restrok/latam-devops/runs/29813402622
+- Ultima ejecución de CI/CD: https://github.com/restrok/latam-devops/runs/29813460954
+- Ultima ejecución de CI: https://github.com/restrok/latam-devops/runs/29813402622
 
 
-   ![Ejecucion de CICD](./images/cloud-build-full.png)
+   ![Ejecución de CICD](./images/cloud-build-full.png)
 
 ### Diagrama de Arquitectura
 
@@ -84,61 +84,69 @@ Adicionalmente como buena practica se debe separar el pipeline de Continuous Int
 ## Parte 3: Pruebas de Integración y Puntos Críticos de Calidad
 
 - Como se menciono en la Parte 2, el pipeline de Deploy tiene definido un Integration-Test como ultimo step.
-- Actualmente el sistema soporta la ingesta de nuevos datos a traves de un POST al endpoint https://my-gateway-5mjnasuv.uc.gateway.dev/upload con un archivo .CSV. Ejemplo: https://www.kaggle.com/datasets/mahoora00135/flights
-- Actualmente el sistema soporta la consulta de datos almacenados a traves de un GET al endpoint https://my-gateway-5mjnasuv.uc.gateway.dev/getdata. Por cuestiones de tiempo el GET no permite suministrar una query customizada, sino que ya esta prefedifina a devolver los 10 primeros rows.
+- Actualmente el sistema soporta la ingesta de nuevos datos a traves de un POST al endpoint https://my-gateway-5mjnasuv.uc.gateway.dev/upload con un archivo CSV. 
+   - Dataset: https://www.kaggle.com/datasets/mahoora00135/flights
+- Actualmente el sistema soporta la consulta de datos almacenados a traves de un GET al endpoint https://my-gateway-5mjnasuv.uc.gateway.dev/getdata. Por cuestiones de tiempo el GET no permite suministrar una query customizada, sino que se encuentra predefinida para devolver los 10 primeros rows.
 
 Seguridad:
- - Por motivos de tiempos no se implemento un sistema de autenticacion a los request de ApiGateway pero se recomienda altamente utilizar un sistema como JWM
+ - Por motivos de tiempos no se implemento un sistema de autenticacion a los request de ApiGateway pero se recomienda altamente utilizar un sistema como JWM.
+ - Se utilizo una unica Service-Account para todo el ecosistema con permisos amplios. Esto no es lo correcto en un ambiente de production donde debe reiniar el minimo privilegio.
+
 
 Algunas aclaraciones:
  - Por motivos de seguridad/costos seguramente el endpoint de ApiGateway se encuentre deshabilitado.
- - El sistema se diseño pensando que durante el POST, un usuario podia subir archivos de gran tamaño. Lo que resulto en utilizar el metodo Funcion>Bucket>Pub/Sub>Funcion y no directamente Pub/Sub como medio para añadir la informacion a BigQuery.
-
+ - El sistema se diseño pensando que durante el POST, un usuario podría subir archivos de gran tamaño. Lo que resulto en utilizar el método Funcion>Bucket>Pub/Sub>Funcion y no directamente Pub/Sub como medio para añadir la informacion a BigQuery.
+ - La solucion propuesta fue pensada para cubrir con creces el problema planteado. Lejos de ser perfecta, no veo grandes puntos de mejora a corto plazo.
+ - Se podria crear alguna estrategia de de auto-healing en caso de que las Cloud Functions fallen por request muy grandes terminando en un time-out.
 
 
 ## Parte 4: Métricas y Monitoreo
 
-- Cloud Functions 
-Latencia de las solicitudes (Response Time):
+### Cloud Functions 
+#### Latencia de las solicitudes (Response Time)
 
    Descripción: La latencia mide el tiempo que tarda tu función desde que recibe una solicitud HTTP hasta que envía una respuesta. Es un indicador crítico del rendimiento y la experiencia del usuario.
 
    Por qué es importante: Una latencia alta puede indicar problemas de rendimiento en la función o en los servicios con los que interactúa. Monitorear la latencia te ayuda a identificar y corregir cuellos de botella para mantener tiempos de respuesta rápidos.
 
-Tasa de errores (Error Rate):
+#### Tasa de errores (Error Rate)
 
    Descripción: La tasa de errores es el porcentaje de llamadas a la función que resultan en errores. Esto incluye errores de ejecución dentro de la función y errores de infraestructura como timeouts o problemas de recursos.
 
    Por qué es importante: Una alta tasa de errores puede afectar la confiabilidad de tu aplicación y la satisfacción del usuario. Monitorear esta métrica te permite detectar y responder a problemas que afectan la salud de tu función.
 
-Tiempo de Inicio en Frío (Cold Start Time):
+#### Tiempo de Inicio en Frío (Cold Start Time):
    Descripción: El tiempo de inicio en frío se refiere al tiempo que tarda una función en manejar una solicitud después de un período de inactividad, durante el cual la infraestructura subyacente debe inicializar una nueva instancia de la función. Este tiempo incluye la carga del código, la inicialización del entorno de ejecución y cualquier inicio de dependencia que tu función necesite antes de poder procesar la solicitud.
    Por qué es importante: Los tiempos de inicio en frío pueden afectar significativamente la latencia de las solicitudes, especialmente para la primera solicitud después de que la función ha estado inactiva. Monitorear esta métrica te permite entender y mitigar el impacto de los inicios en frío en la experiencia del usuario, y puede ayudarte a tomar decisiones sobre estrategias como el precalentamiento de instancias o la optimización de la inicialización de tu función.
 
-- Cloud Storage
-   Eventos de Creación de Archivos: Asegúrate de que los eventos de creación de archivos en tu bucket estén siendo registrados. Puedes configurar el registro de auditoría o los registros de acceso para rastrear las operaciones de creación (storage.objects.create) en tu bucket.
+### Cloud Storage
 
--Tasa de Errores (Error Rate):
+#### Eventos de Creación de Archivos
+   Asegúrate de que los eventos de creación de archivos en tu bucket estén siendo registrados. Puedes configurar el registro de auditoría o los registros de acceso para rastrear las operaciones de creación (storage.objects.create) en tu bucket.
+
+### ApiGateway
+
+#### Tasa de Errores (Error Rate):
 
    Descripción: La tasa de errores es el porcentaje de solicitudes que resultan en errores. Esto incluye errores del cliente (errores 4xx) y errores del servidor (errores 5xx).
 
    Por qué es importante: Monitorear la tasa de errores puede ayudarte a identificar problemas con la API que afecten la experiencia del usuario, como errores de configuración, problemas de autenticación o errores de backend. Una tasa de errores alta o un aumento repentino pueden ser indicadores de un problema que necesita atención inmediata.
 
-Latencia de las Solicitudes (Request Latency):
+#### Latencia de las Solicitudes (Request Latency):
 
    Descripción: La latencia mide el tiempo que tarda una solicitud en ser procesada por el API Gateway, incluyendo el tiempo de ida y vuelta de la red, el procesamiento del Gateway y el tiempo de respuesta del backend.
 
    Por qué es importante: La latencia es un indicador clave del rendimiento de tu API. Una latencia alta puede resultar en una mala experiencia para el usuario final y puede ser un indicador de cuellos de botella en el procesamiento del API Gateway o en los servicios backend. Monitorear la latencia te permite optimizar tus APIs y escalar recursos adecuadamente para manejar la carga de trabajo.
 
 
-- Todas estas metricas pueden ser generadas en un Dashboard Personalizado del servicio Cloud Monitoring.
+### Todas estas metricas pueden ser generadas en un Dashboard personalizado en el servicio Cloud Monitoring.
 
 ## Parte 5: Alertas y SRE (Opcional)
 
 En la misma herramienta (Cloud Monitoring) podemos definir nuestras Alertas.
 
 ### Caso hipotetico para generacion de alertas
-Podemos suponer que nuestro sistema sera consumido por 50 aeropuertos y cada uno tiene una capacidad maxima de despegar hasta 10 aviones por hora. Como regla de negocio a cada despegue exitoso se hara un POST a nuestro sistema.
+Podemos suponer que nuestro sistema será consumido por 50 aeropuertos y cada uno tiene una capacidad máxima de despegar hasta 10 aviones por hora. Como regla de negocio a cada despegue exitoso se hará un POST a nuestro sistema.
 
 Tendríamos un máximo teórico de 500 solicitudes POST por hora bajo condiciones normales de funcionamiento.
 
@@ -169,9 +177,9 @@ SLO: Menos del 1% de las solicitudes POST resultarán en errores 5xx.
 Argumento: Una baja tasa de errores es crucial para la integridad de las operaciones de despegue. Un SLO del 1% permite cierto margen para errores inesperados o problemas transitorios sin comprometer significativamente la funcionalidad general del sistema. Se desechó un SLO más estricto porque podría requerir una redundancia y una infraestructura que excedan el presupuesto y la complejidad necesaria para el sistema.
 
 ## Algunas aclaraciones finales:
-- Teniendo la posibilidad de usar los servicios nativos de GCP no veo la necesidad de implementar herramietas opensource como FastAPI, MQTT, Prometheus/Grafana.
-- Adicionalmente la implementacion de herramientas open source requeriria a futuro mantenimiento, sin contar todas las configuraciones de seguridad necesarias para correr en un ambiente productivo.
-- Por cuestiones de tiempo aqui solo implementamos un ambiente unico, pero podria cambiarse el naming-convention para hacerlo compatible con multiples ambientes
+- Teniendo la posibilidad de usar los servicios nativos de GCP no veo la necesidad de implementar herramientas opensource como FastAPI, MQTT, Prometheus/Grafana.
+- Adicionalmente, la implementación de herramientas open-source requeriria a futuro mantenimiento, sin contar todas las configuraciones de seguridad necesarias para correr en un ambiente productivo.
+- Por cuestiones de tiempo aqui solo se implementa un ambiente, pero podria cambiarse el naming-convention para hacerlo compatible con multiples ambientes
 - Al haber decidido hacer una solucion serverless la escalabilidad o replicacion no deberia ser inconveniente. Ya que esto facilita tanto escalar horizontal como verticalmente.
 - Captura de git-flow:
 

@@ -17,6 +17,7 @@ steps:
     args:
       - '-c'
       - |
+        apt-get install -y zip
         cd src
         for dir in get_data_from_bigquery ingest_data_to_bucket process_data_to_bigquery; do
           zip -r ${dir}-develop.zip ${dir}/main.py ${dir}/requirements.txt

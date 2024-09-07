@@ -1,0 +1,62 @@
+steps:
+  # Unit Test
+  # - name: 'python:3.9'
+  #   id: 'Run Unit Tests'
+  #   entrypoint: 'bash'
+  #   args:
+  #     - '-c'
+  #     - |
+  #       python -m unittest discover -s src/unit-test/
+
+  # <if branch == develop end the pipeline>
+
+  # # ZIP CF Code
+  - name: 'ubuntu'
+    id: 'Zip Functions'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        apt-get update && apt-get install -y zip
+        cd src
+        for dir in get_data_from_bigquery ingest_data_to_bucket process_data_to_bigquery; do
+          cd ${dir}
+          zip -r ../${dir}-develop.zip main.py requirements.txt
+          cd ..
+        done
+    # waitFor: ['Run Unit Tests']
+
+  # # Upload ZIP files to bucket
+  - name: 'gcr.io/cloud-builders/gsutil'
+    id: 'Upload Zips'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        gsutil cp src/*.zip gs://function-code-bucket-latam_test/
+    # waitFor: ['Zip Functions']
+
+  #<Terrafom Validate>
+
+  # Terraform Init
+  - name: 'hashicorp/terraform:latest'
+    id: 'Terraform Init'
+    args:
+      - 'init'
+      - '-input=false'
+    dir: 'infra'      
+
+
+  # Terraform Plan
+  - name: 'hashicorp/terraform:latest'
+    id: 'Terraform Plan'
+    args:
+      - 'plan'
+      - '-var-file=vars/dev.tfvars'
+      - '-var=build_version=develop'
+      - '-input=false'
+      - '-out=tfplan'
+    dir: 'infra'      
+
+options:
+  defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET

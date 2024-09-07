@@ -1,0 +1,108 @@
+[
+    {
+      "name": "id",
+      "type": "INTEGER",
+      "mode": "REQUIRED"
+    },
+    {
+      "name": "year",
+      "type": "INTEGER",
+      "mode": "REQUIRED"
+    },
+    {
+      "name": "month",
+      "type": "INTEGER",
+      "mode": "REQUIRED"
+    },
+    {
+      "name": "day",
+      "type": "INTEGER",
+      "mode": "REQUIRED"
+    },
+    {
+      "name": "dep_time",
+      "type": "INTEGER",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "sched_dep_time",
+      "type": "INTEGER",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "dep_delay",
+      "type": "FLOAT",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "arr_time",
+      "type": "INTEGER",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "sched_arr_time",
+      "type": "INTEGER",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "arr_delay",
+      "type": "FLOAT",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "carrier",
+      "type": "STRING",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "flight",
+      "type": "STRING",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "tailnum",
+      "type": "STRING",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "origin",
+      "type": "STRING",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "dest",
+      "type": "STRING",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "air_time",
+      "type": "FLOAT",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "distance",
+      "type": "FLOAT",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "hour",
+      "type": "INTEGER",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "minute",
+      "type": "INTEGER",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "time_hour",
+      "type": "TIMESTAMP",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "name",
+      "type": "STRING",
+      "mode": "NULLABLE"
+    }
+  ]
+  

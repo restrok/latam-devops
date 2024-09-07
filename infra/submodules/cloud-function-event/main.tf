@@ -7,13 +7,13 @@ terraform {
   }
 }
 
-resource "google_storage_bucket_object" "archive" {
-  for_each = var.functions
+# resource "google_storage_bucket_object" "archive" {
+#   for_each = var.functions
 
-  name   = "${each.value.name}.zip"
-  bucket = var.source_code_bucket
-  source = "../src/${each.value.name}.zip"
-}
+#   name   = "${each.value.name}.zip"
+#   bucket = var.source_code_bucket
+#   source = "../src/${each.value.name}.zip"
+# }
 
 resource "google_pubsub_topic" "topic" {
   for_each = var.functions
@@ -28,7 +28,8 @@ resource "google_cloudfunctions_function" "function_event" {
   runtime               = each.value.runtime
   entry_point           = each.value.entry_point
   source_archive_bucket = var.source_code_bucket
-  source_archive_object = google_storage_bucket_object.archive[each.key].name
+  # source_archive_object = google_storage_bucket_object.archive[each.key].name
+  source_archive_object = "${each.value.name}-${var.version}.zip"
   event_trigger {
     event_type = each.value.event_trigger_type
     resource   = google_pubsub_topic.topic[each.key].id

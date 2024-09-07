@@ -21,6 +21,7 @@ module "http_functions" {
 
   functions          = var.cloud_functions_http
   source_code_bucket = "function-code-bucket-${var.project_prefix}"
+  version = var.version
 
   depends_on = [module.storage]
 }
@@ -30,6 +31,7 @@ module "event_functions" {
 
   functions          = var.cloud_functions_event
   source_code_bucket = "function-code-bucket-${var.project_prefix}"
+  version = var.version
 
   depends_on = [module.storage]
 }

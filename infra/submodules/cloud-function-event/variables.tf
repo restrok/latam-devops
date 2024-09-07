@@ -14,3 +14,5 @@ variable "functions" {
     environment_variables = map(string)
   }))
 }
+
+variable "version" {}

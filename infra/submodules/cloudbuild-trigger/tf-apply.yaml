@@ -9,8 +9,6 @@ steps:
   #     - |
   #       python -m unittest discover -s src/unit-test/
 
-  # <if branch == develop end the pipeline>
-
   # # ZIP CF Code
   - name: 'ubuntu'
     id: 'Zip Functions'

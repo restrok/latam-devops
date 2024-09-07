@@ -141,6 +141,8 @@ Algunas aclaraciones:
 
 ### Todas estas metricas pueden ser generadas en un Dashboard personalizado en el servicio Cloud Monitoring.
 
+   ![Ejemplo de metrics](./images/api-gtw-metrics.png)
+
 ## Parte 5: Alertas y SRE (Opcional)
 
 En la misma herramienta (Cloud Monitoring) podemos definir nuestras Alertas.

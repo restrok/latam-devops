@@ -16,39 +16,39 @@ module "storage" {
   labels             = var.labels
 }
 
-# module "http_functions" {
-#   source = "./submodules/cloud-function-http"
+module "http_functions" {
+  source = "./submodules/cloud-function-http"
 
-#   functions          = var.cloud_functions_http
-#   source_code_bucket = "function-code-bucket-${var.project_prefix}"
-#   code_version       = var.build_version
+  functions          = var.cloud_functions_http
+  source_code_bucket = "function-code-bucket-${var.project_prefix}"
+  code_version       = var.build_version
 
-#   depends_on = [module.storage]
-# }
+  depends_on = [module.storage]
+}
 
-# module "event_functions" {
-#   source = "./submodules/cloud-function-event"
+module "event_functions" {
+  source = "./submodules/cloud-function-event"
 
-#   functions          = var.cloud_functions_event
-#   source_code_bucket = "function-code-bucket-${var.project_prefix}"
-#   code_version       = var.build_version
+  functions          = var.cloud_functions_event
+  source_code_bucket = "function-code-bucket-${var.project_prefix}"
+  code_version       = var.build_version
 
-#   depends_on = [module.storage]
-# }
+  depends_on = [module.storage]
+}
 
-# module "api_gateway" {
-#   source          = "./submodules/api-gateway"
-#   project_id      = var.project_id
-#   region          = var.region
-#   api_name        = "my-api"
-#   api_config_name = "my-api-config"
-#   gateway_name    = "my-gateway"
-#   functions = {
-#     upload_data = module.http_functions.http_function_urls["ingest_data_to_bucket"]
-#     get_data    = module.http_functions.http_function_urls["get_data_from_bigquery"]
-#   }
-#   # openapi_template_path = "${path.module}/openapi.yaml.tpl"
-# }
+module "api_gateway" {
+  source          = "./submodules/api-gateway"
+  project_id      = var.project_id
+  region          = var.region
+  api_name        = "my-api"
+  api_config_name = "my-api-config"
+  gateway_name    = "my-gateway"
+  functions = {
+    upload_data = module.http_functions.http_function_urls["ingest_data_to_bucket"]
+    get_data    = module.http_functions.http_function_urls["get_data_from_bigquery"]
+  }
+  # openapi_template_path = "${path.module}/openapi.yaml.tpl"
+}
 
 module "bigquery" {
   source = "./submodules/bigquery"

@@ -19,7 +19,7 @@ def get_data():
 # Función principal que ejecuta los tests
 def main():
     # Ruta al archivo que se va a enviar
-    file_path = 'src/int-test/test.csv'
+    file_path = 'test.csv'
     
     # Realizar POST request
     post_response = post_data(file_path)

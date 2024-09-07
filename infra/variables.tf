@@ -6,7 +6,7 @@ variable "time_partitioning_type" {}
 variable "project_prefix" {}
 variable "cloud_functions_http" {}
 variable "cloud_functions_event" {}
-variable "version" {}
+variable "build_version" {}
 
 
 variable "buckets" {

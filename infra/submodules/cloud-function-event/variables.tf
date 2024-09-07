@@ -15,4 +15,4 @@ variable "functions" {
   }))
 }
 
-variable "version" {}
+variable "code_version" {}

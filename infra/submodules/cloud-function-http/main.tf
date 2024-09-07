@@ -23,7 +23,7 @@ resource "google_cloudfunctions_function" "function_http" {
   entry_point           = each.value.entry_point
   source_archive_bucket = var.source_code_bucket
   # source_archive_object = google_storage_bucket_object.archive[each.key].name
-  source_archive_object = "${each.value.name}-${var.version}.zip"
+  source_archive_object = "${each.value.name}-${var.code_version}.zip"
   trigger_http          = true
   environment_variables = each.value.environment_variables
 

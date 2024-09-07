@@ -36,19 +36,19 @@ module "event_functions" {
   depends_on = [module.storage]
 }
 
-# module "api_gateway" {
-#   source          = "./submodules/api-gateway"
-#   project_id      = var.project_id
-#   region          = var.region
-#   api_name        = "my-api"
-#   api_config_name = "my-api-config"
-#   gateway_name    = "my-gateway"
-#   functions = {
-#     upload_data = module.http_functions.http_function_urls["ingest_data_to_bucket"]
-#     get_data    = module.http_functions.http_function_urls["get_data_from_bigquery"]
-#   }
-#   # openapi_template_path = "${path.module}/openapi.yaml.tpl"
-# }
+module "api_gateway" {
+  source          = "./submodules/api-gateway"
+  project_id      = var.project_id
+  region          = var.region
+  api_name        = "my-api"
+  api_config_name = "my-api-config"
+  gateway_name    = "my-gateway"
+  functions = {
+    upload_data = module.http_functions.http_function_urls["ingest_data_to_bucket"]
+    get_data    = module.http_functions.http_function_urls["get_data_from_bigquery"]
+  }
+  # openapi_template_path = "${path.module}/openapi.yaml.tpl"
+}
 
 module "bigquery" {
   source = "./submodules/bigquery"

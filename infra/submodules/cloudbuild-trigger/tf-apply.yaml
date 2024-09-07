@@ -22,7 +22,7 @@ steps:
         cd src
         for dir in get_data_from_bigquery ingest_data_to_bucket process_data_to_bigquery; do
           cd ${dir}
-          zip -r ../${dir}-develop.zip main.py requirements.txt
+          zip -r ../${dir}-master.zip main.py requirements.txt
           cd ..
         done
     # waitFor: ['Run Unit Tests']
@@ -55,7 +55,7 @@ steps:
       - '-input=false'
       - '-auto-approve'
       - '-var-file=vars/dev.tfvars'
-      - '-var="build_version=master"'      
+      - '-var=build_version=master'    
     dir: 'infra'
 
   # Integration Test
@@ -65,8 +65,8 @@ steps:
     args:
       - '-c'
       - |
-        pip install -r requirements-tests.txt && \
-        python -m main.py
+        pip install -r requirements.txt && \
+        python main.py
     dir: 'src/int-test'
 
 options:

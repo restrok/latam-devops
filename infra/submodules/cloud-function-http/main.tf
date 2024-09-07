@@ -27,6 +27,8 @@ resource "google_cloudfunctions_function" "function_http" {
   trigger_http          = true
   environment_variables = each.value.environment_variables
 
+  # service_account_email = "latam-test@latam-test-434700.iam.gserviceaccount.com"
+
   # Aquí irían otras configuraciones específicas para funciones HTTP...
 }
 

@@ -36,7 +36,7 @@ resource "google_cloudfunctions_function" "function_event" {
   }
   environment_variables = each.value.environment_variables
 
-  service_account_email = "latam-test@latam-test-434700.iam.gserviceaccount.com"
+  # service_account_email = "latam-test@latam-test-434700.iam.gserviceaccount.com"
 
   # Aquí irían otras configuraciones específicas para funciones de evento...
 }

@@ -66,7 +66,7 @@ steps:
       - '-c'
       - |
         pip install -r requirements.txt && \
-        python -m main.py
+        python main.py
     dir: 'src/int-test'
 
 options:

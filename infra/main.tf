@@ -16,25 +16,25 @@ module "storage" {
   labels             = var.labels
 }
 
-module "http_functions" {
-  source = "./submodules/cloud-function-http"
+# module "http_functions" {
+#   source = "./submodules/cloud-function-http"
 
-  functions          = var.cloud_functions_http
-  source_code_bucket = "function-code-bucket-${var.project_prefix}"
-  code_version       = var.build_version
+#   functions          = var.cloud_functions_http
+#   source_code_bucket = "function-code-bucket-${var.project_prefix}"
+#   code_version       = var.build_version
 
-  depends_on = [module.storage]
-}
+#   depends_on = [module.storage]
+# }
 
-module "event_functions" {
-  source = "./submodules/cloud-function-event"
+# module "event_functions" {
+#   source = "./submodules/cloud-function-event"
 
-  functions          = var.cloud_functions_event
-  source_code_bucket = "function-code-bucket-${var.project_prefix}"
-  code_version       = var.build_version
+#   functions          = var.cloud_functions_event
+#   source_code_bucket = "function-code-bucket-${var.project_prefix}"
+#   code_version       = var.build_version
 
-  depends_on = [module.storage]
-}
+#   depends_on = [module.storage]
+# }
 
 # module "api_gateway" {
 #   source          = "./submodules/api-gateway"

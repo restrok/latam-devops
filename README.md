@@ -8,7 +8,7 @@ Desarrollar un sistema en la nube para ingestar, almacenar y exponer datos media
 
 
 ## Parte 1: Infraestructura e IaC
-### 1. Infraestructura Necesaria para la Ingesta de Datos
+### 1. Infraestructura para la Ingesta de Datos
 ApiGateway: Expone un endpoint HTTP que permite la recepción de datos a través de un POST request. El path configura una Cloud Function como backend.
 
 Cloud Function (Ingesta): Recibe el archivo CSV mediante POST request y lo almacena en un bucket de Google Cloud Storage.
@@ -19,10 +19,14 @@ Google Cloud Pub/Sub: Al detectar el nuevo mensaje, activa otra Cloud Function e
 
 Cloud Function (Procesamiento): Lee el contenido del archivo CSV del bucket y lo inserta en Google BigQuery para su almacenamiento y análisis.
 
-### 2. Infraestructura Necesaria para la Exposición de Datos
+BigQuery: Para el alamcenamientos de datos.
+
+### 2. Infraestructura para la Exposición de Datos
 ApiGateway: Contiene un path adicional que, mediante un GET request, acciona otra Cloud Function.
 
 Cloud Function (Consulta): Realiza un query a Google BigQuery y devuelve los datos solicitados en respuesta al GET request.
+
+BigQuert: Fuente de datos.
 
 Con esta configuración, se logra un flujo de datos que va desde la recepción y almacenamiento en bruto hasta la transformación y disponibilidad para análisis y consumo por parte de terceros. La infraestructura serverless permite escalar según la demanda y simplifica la gestión operativa del sistema.
 
@@ -31,54 +35,55 @@ Toda la IaC se encuentra dentro de la carpeta "infra" del repositorio.
 
 ## Parte 2: Aplicaciones y flujo CI/CD
 
-Se utiliza un único repositorio para infraestructura y aplicación, con pipelines diferenciados para 'develop' y 'master'. Se recomienda separar infraestructura y aplicación en repositorios distintos para entornos productivos.
-Adicionalmente como buena practica se debe separar el pipeline de Continuous Integration y Continuous Deployment.
+Se utiliza un único repositorio para infraestructura y aplicación, con pipelines diferenciados para 'develop' y 'master'.
 
-#### Pipelines Step-by-Step:
-- Push a la branch 'develop'
-   - Paso uno correr los Unit Test
-   - Paso dos generar los artefactos para cada Cloud Function y subirlo al bucket correspondiente.
-   - Paso tres validar terraform
-   - Paso cuatro inicializar terraform
-   - Paso cinco terraform plan
-- Push a la branch 'master'
-   - Paso uno correr los Unit Test
-   - Paso dos generar los artefactos para cada Cloud Function y subirlo al bucket correspondiente.
-   - Paso tres validar terraform
-   - Paso cuatro inicializar terraform
-   - Paso cinco terraform apply
-   - Test de Integracion
+**Nota:**
+1. Se recomienda separar infraestructura y aplicación en repositorios distintos para entornos productivos.
+2. Adicionalmente, como buena práctica, deberia armar pipelines diferenciados entre Continuous Integration y Continuous Deployment.
 
-#### Algunas aclaraciones:
-   - Se utiliza una convención de nombres para artefactos.
- '<function_name>-<develop/master>.zip'
-   - Los Unit Test no están generados, por lo que ese paso se saltea
-   - El test de integración solo espera como respuesta valida un 200. Por lo qu  e en un ambiente productivo seria necesario mejorar el codigo para validad que realmente la información devuelta por el sistema sea la esperada.
+### Pipelines Step-by-Step:
+
+#### Push a la branch 'develop'
+1. Paso uno: Correr los Unit Test
+2. Paso dos: Generar los artefactos para cada Cloud Function y subirlos al bucket correspondiente.
+3. Paso tres: Validar terraform
+4. Paso cuatro: Inicializar terraform
+5. Paso cinco: Terraform plan
+
+#### Push a la branch 'master'
+1. Paso uno: Correr los Unit Test
+2. Paso dos: Generar los artefactos para cada Cloud Function y subirlos al bucket correspondiente.
+3. Paso tres: Validar terraform
+4. Paso cuatro: Inicializar terraform
+5. Paso cinco: Terraform apply
+6. Test de Integración
+
+### Algunas aclaraciones:
+- Se utiliza una convención de nombres para los artefactos: '<function_name>-<develop/master>.zip'
+- Los Unit Test no están generados, por lo que este paso se saltea.
+- El test de integración solo espera como respuesta válida un 200. En un ambiente productivo, sería necesario mejorar el código para validar que la información devuelta por el sistema sea la esperada.
    ![Integration Test](./images/int-test.png)
-   - El 'terraform validate' no se ejecuta para agilizar el proceso, pero es recomendable realizarlo en producción.
+- El 'terraform validate' no se ejecuta para agilizar el proceso, pero es recomendable realizarlo en producción.
 
+### Ejecuciones:
+- Última ejecución de CI/CD: [Enlace a la ejecución](https://github.com/restrok/latam-devops/runs/29813460954)
+- Última ejecución de CI: [Enlace a la ejecución](https://github.com/restrok/latam-devops/runs/29813402622)
 
-#### Ejecuciones:
-- Ultima ejecución de CI/CD: https://github.com/restrok/latam-devops/runs/29813460954
-- Ultima ejecución de CI: https://github.com/restrok/latam-devops/runs/29813402622
-
-
-   ![Ejecución de CICD](./images/cloud-build-full.png)
+![Ejecución de CI/CD](./images/cloud-build-full.png)
 
 ### Diagrama de Arquitectura
 
-   ![Diagrama de Arquitectura](./images/diagram.png)
+![Diagrama de Arquitectura](./images/diagram.png)
 
-1. **Productores de Datos** publican mensajes usando un endpoint (API HTTP) de ApiGateway, el cual es recibido por una Cloud Function.
-2. **cloud function** almacena el mensaje recibido en un bucket
-3. **Google Cloud Storage** envia una notificacion por medio de un topico que un nuevo elemento a sido cargado
-4. **Google Cloud Pub/Sub** inicializa una cloud fuction que subira los nuevos datos a big query
-5. **Google Cloud Functions (Ingesta)** se activa por mensajes en la suscripción de Pub/Sub y procesa los datos, almacenándolos en Google BigQuery.
-6. **Google BigQuery** almacena los datos de manera optimizada para análisis.
-
-7. **Google ApiGateway** expone un endpoint HTTP para que terceros puedan consumir los datos almacenados o cargar nuevos.
-8. **Google Cloud Functions (API HTTP)** se activa mediante peticiones HTTP gestionadas por Google Cloud ApiGateway y consulta los datos en Google BigQuery.
-9bigquery sirve los datos solicitados en la query
+1. **Productores de Datos**: publican mensajes usando un endpoint (API HTTP) de ApiGateway, el cual es recibido por una Cloud Function.
+2. **Cloud Function**: almacena el mensaje recibido en un bucket.
+3. **Google Cloud Storage**: envía una notificación por medio de un tópico indicando que un nuevo elemento ha sido cargado.
+4. **Google Cloud Pub/Sub**: inicializa una Cloud Function que subirá los nuevos datos a BigQuery.
+5. **Google Cloud Functions (Ingesta)**: se activa por mensajes en la suscripción de Pub/Sub y procesa los datos, almacenándolos en Google BigQuery.
+6. **Google BigQuery**: almacena los datos de manera optimizada para análisis.
+7. **Google ApiGateway**: expone un endpoint HTTP para que terceros puedan consumir los datos almacenados o cargar nuevos.
+8. **Google Cloud Functions (API HTTP)**: se activa mediante peticiones HTTP gestionadas por Google Cloud ApiGateway y consulta los datos en Google BigQuery.
+9. **Google BigQuery**: sirve los datos solicitados en la consulta.
 
 
 ## Parte 3: Pruebas de Integración y Puntos Críticos de Calidad
@@ -98,6 +103,9 @@ Algunas aclaraciones:
  - El sistema se diseño pensando que durante el POST, un usuario podría subir archivos de gran tamaño. Lo que resulto en utilizar el método Funcion>Bucket>Pub/Sub>Funcion y no directamente Pub/Sub como medio para añadir la informacion a BigQuery.
  - La solucion propuesta fue pensada para cubrir con creces el problema planteado. Lejos de ser perfecta, no veo grandes puntos de mejora a corto plazo.
  - Se podria crear alguna estrategia de de auto-healing en caso de que las Cloud Functions fallen por request muy grandes terminando en un time-out.
+ - La funcion encargada de manejar los datos recibidos por el POST no dispone de una validacion de los datos. Algunas recomendaciones para esto serian:
+   - Guardar en una tabla de BigQuery toda la metadata posible del request que intento realizar la carga de datos, incluyendo el nombre del archivo (si lo hubiera). Eso facilitara su posterior analisis.
+   - Devolver un mensaje de error al usuario informando posibles soluciones estandar.
 
 
 ## Parte 4: Métricas y Monitoreo
@@ -122,7 +130,15 @@ Algunas aclaraciones:
 ### Cloud Storage
 
 #### Eventos de Creación de Archivos
-   Asegúrate de que los eventos de creación de archivos en tu bucket estén siendo registrados. Puedes configurar el registro de auditoría o los registros de acceso para rastrear las operaciones de creación (storage.objects.create) en tu bucket.
+Descripción: Los eventos de creación de archivos son registros que se generan cada vez que se crea un nuevo archivo en tu bucket de Cloud Storage. Estos eventos registran información como la hora de creación, el nombre del archivo y el tamaño del archivo.
+
+Por qué es importante: Monitorear los eventos de creación de archivos te permite tener un registro detallado de todas las operaciones de carga de archivos en tu bucket. Esto es útil para rastrear y auditar las actividades de carga de datos, asegurando la integridad y trazabilidad de los archivos almacenados. Además, estos eventos pueden ser utilizados para desencadenar acciones o procesos automatizados en función de la creación de nuevos archivos.
+
+#### Contador de objetos
+Descripción: El contador de objetos es una métrica que registra la cantidad total de objetos (archivos y carpetas) almacenados en tu bucket de Cloud Storage.
+
+Por qué es importante: El contador de objetos te proporciona una visión general del volumen de datos almacenados en tu bucket. Esta métrica es útil para monitorear el crecimiento y la utilización de tu almacenamiento, lo que te permite tomar decisiones informadas sobre la capacidad y los costos asociados. Además, el seguimiento de esta métrica te ayuda a identificar cualquier anomalía o discrepancia en la cantidad de objetos almacenados, lo que puede ser indicativo de problemas en la gestión de tus archivos.
+   
 
 ### ApiGateway
 
@@ -141,7 +157,9 @@ Algunas aclaraciones:
 
 ### Todas estas metricas pueden ser generadas en un Dashboard personalizado en el servicio Cloud Monitoring.
 
-   ![Ejemplo de metrics](./images/api-gtw-metrics.png)
+Ejemplo de algunas metricas de ApiGateway
+
+![Ejemplo de metrics](./images/api-gtw-metrics.png)
 
 ## Parte 5: Alertas y SRE (Opcional)
 
@@ -164,11 +182,12 @@ Condición: Si el número de solicitudes POST por hora es significativamente men
 Configuración de la Alerta: Configura una política de alertas para que se dispare si el número de solicitudes POST cae por debajo de, por ejemplo, 400 por hora, lo que podría indicar que los aviones no están siendo registrados correctamente.
 
 
-SLIs y SLOs:
+### SLIs y SLOs:
 SLI: Latencia de Respuesta de las Solicitudes POST
 
 SLO: El 95% de las solicitudes POST recibirán una respuesta en menos de 300 milisegundos.
 Argumento: La latencia de respuesta es crítica para un sistema que procesa despegues de aviones, ya que puede afectar las operaciones en tiempo real de los aeropuertos. Un SLO de 300 milisegundos garantiza un servicio ágil y eficiente. Se desechó un umbral más bajo ya que podría ser demasiado estricto y difícil de cumplir dado el tráfico variable y las dependencias de red.
+
 SLI: Disponibilidad del API Gateway
 
 SLO: El API Gateway estará disponible el 99.9% del tiempo cada mes.
